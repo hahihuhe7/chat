@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COCOA TALK</title>      
+    <style>
+        #chatWrap {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 500px;            
+            min-height: 700px;
+            margin: 0 auto;
+            background-color:rgb(134, 176, 202);
+            border-radius: 10px;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.5);
+        } 
+
+        #contents {                 
+            width: 80%; 
+            margin: 10px; 
+            overflow: hidden;
+        }
+
+        #contents li:nth-child(odd){
+            width: 60%;
+            height: auto;
+            padding: 2px;
+            margin: 5px;
+            list-style: none;
+            background: yellow;
+            text-align: right;
+            float: right;
+        }
+
+        #contents li:nth-child(even){
+            width: 60%;
+            height: auto;
+            padding: 2px;
+            margin: 5px;
+            list-style: none;
+            background: white;
+            text-align: left;
+            float: left;
+        }       
+
+        #contents li span {
+            font-size: 0.7rem;
+            color :grey
+        }
+
+        #chatInput{
+            display: flex;
+            flex-direction: row;
+            justify-content:flex-start;
+            margin: 15px;
+            font-size: 13px;  
+            font-weight: bold;         
+        }
+
+        #user{            
+            margin-right: 5px;
+            width: 110px;
+        }
+
+        #message{
+            width: 220px;
+            margin-right: 5px;
+        }            
+
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        window.onload = function(){
+            let socket = io.connect();
+
+            btnSender.onclick = function(){
+                const date = new Date();
+                const month = date.getMonth() +1;
+                const day = date.getDate();
+                socket.emit('msg', {
+                    name : user.value,
+                    message : message.value,
+                    date : `${month}월 ${day}일`
+                })    
+            }
+
+            socket.on('clientMsg', function(data){
+                let output = '';
+                output += '<li>';
+                output += `<b>${data.name}</b> : `;
+                output += `${data.message}`;  
+                output += `<span> &nbsp; &nbsp; ${data.date}</span>`;
+                output += '</li>';
+
+                contents.insertAdjacentHTML('beforeend', output);
+            })            
+        };
+
+
+    </script>    
+</head>
+<body>
+    <div id="chatWrap">
+        <ul id="contents"></ul>
+        <div id="chatInput">  
+             <div id="userName">
+                 <label for="user">이름</label>
+                  <input id="user" placeholder="이름" />
+            </div>
+            <div id="userMsg">
+                <label for="message">내용</label>
+                <input id="message" placeholder="내용" /> 
+            </div> 
+            <button id="btnSender"> 전송</button>    
+        </div>  
+    </div>   
+</body>
+</html>
